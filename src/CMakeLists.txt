@@ -19,7 +19,7 @@
 # Setup shared library variant
 ########################################################################
 add_library(rtlsdr SHARED librtlsdr.c
-  tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c)
+  tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c tuner_fmd1216.c)
 target_link_libraries(rtlsdr PkgConfig::LIBUSB)
 target_include_directories(rtlsdr PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
@@ -35,7 +35,7 @@ generate_export_header(rtlsdr)
 # Setup static library variant
 ########################################################################
 add_library(rtlsdr_static STATIC librtlsdr.c
-  tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c)
+  tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c tuner_fmd1216.c)
 target_link_libraries(rtlsdr_static PkgConfig::LIBUSB)
 target_include_directories(rtlsdr_static PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>

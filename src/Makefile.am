@@ -9,7 +9,7 @@ AM_CFLAGS = ${CFLAGS} -fPIC ${SYMBOL_VISIBILITY}
 
 lib_LTLIBRARIES = librtlsdr.la
 
-librtlsdr_la_SOURCES = librtlsdr.c tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c
+librtlsdr_la_SOURCES = librtlsdr.c tuner_e4k.c tuner_fc0012.c tuner_fc0013.c tuner_fc2580.c tuner_r82xx.c tuner_fmd1216.c
 librtlsdr_la_LDFLAGS = -version-info $(LIBVERSION)
 
 bin_PROGRAMS         = rtl_sdr rtl_tcp rtl_test rtl_fm rtl_eeprom rtl_adsb rtl_power

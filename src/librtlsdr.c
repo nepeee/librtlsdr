@@ -54,6 +54,7 @@
 #include "tuner_fc0013.h"
 #include "tuner_fc2580.h"
 #include "tuner_r82xx.h"
+#include "tuner_fmd1216.h"
 
 typedef struct rtlsdr_tuner_iface {
 	/* tuner interface */
