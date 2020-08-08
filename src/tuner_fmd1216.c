@@ -17,7 +17,7 @@ int fmd1216_set_freq(struct fmd1216_state *priv, uint32_t freq) {
 	uint8_t band;
 	uint16_t mod;
 	
-	freq = freq + IF_FREQ;
+	freq = freq + FMD1216_IF_FREQ;
 	mod = freq % 12500;
 	freq = freq / 12500;
 	if (mod>6249)
@@ -48,7 +48,7 @@ int fmd1216_set_freq(struct fmd1216_state *priv, uint32_t freq) {
 			data[0] = (freq >> 8) & 0xFF; //db1
 			data[1] = freq & 0xFF; //db2
 
-			if (rtlsdr_i2c_write_fn(dev, FMD1216_I2C_ADDR, data, 2) < 0)
+			if (rtlsdr_i2c_write_fn(priv->dev, FMD1216_I2C_ADDR, data, 2) < 0)
 				return -1;			
 		}
 		
