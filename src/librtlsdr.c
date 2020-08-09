@@ -268,12 +268,14 @@ int r820t_set_gain_mode(void *dev, int manual) {
 
 int _fmd1216_init(void *dev) {
 	rtlsdr_dev_t* devt = (rtlsdr_dev_t*)dev; 
-	return fmd1216_init(devt->fmd1216_s);
+	devt->fmd1216_s.rtl_dev = dev;
+	
+	return fmd1216_init(&devt->fmd1216_s);
 }
 int _fmd1216_exit(void *dev) { return 0; }
 int _fmd1216_set_freq(void *dev, uint32_t freq) {
 	rtlsdr_dev_t* devt = (rtlsdr_dev_t*)dev;
-	return fmd1216_set_freq(devt->fmd1216_s, freq);
+	return fmd1216_set_freq(&devt->fmd1216_s, freq);
 }
 int _fmd1216_set_bw(void *dev, int bw) { return 0; }
 int _fmd1216_set_gain(void *dev, int gain) { return 0; }
