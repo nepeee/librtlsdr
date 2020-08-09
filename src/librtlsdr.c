@@ -269,7 +269,7 @@ int r820t_set_gain_mode(void *dev, int manual) {
 int _fmd1216_init(void *dev) {
 	rtlsdr_dev_t* devt = (rtlsdr_dev_t*)dev; 
 	devt->fmd1216_s.rtl_dev = dev;
-	
+
 	return fmd1216_init(&devt->fmd1216_s);
 }
 int _fmd1216_exit(void *dev) { return 0; }
@@ -1247,7 +1247,8 @@ int rtlsdr_set_direct_sampling(rtlsdr_dev_t *dev, int on)
 		}
 
 		/* opt_adc_iq = 0, default ADC_I/ADC_Q datapath */
-		r |= rtlsdr_demod_write_reg(dev, 0, 0x06, (dev->tuner_type == RTLSDR_TUNER_FMD1216) ? 0x90 : 0x80, 1);
+		//r |= rtlsdr_demod_write_reg(dev, 0, 0x06, (dev->tuner_type == RTLSDR_TUNER_FMD1216) ? 0x90 : 0x80, 1);
+		r |= rtlsdr_demod_write_reg(dev, 0, 0x06, 0x80, 1);
 
 		fprintf(stderr, "Disabled direct sampling mode\n");
 		dev->direct_sampling = 0;
@@ -1658,7 +1659,7 @@ found:
 		rtlsdr_demod_write_reg(dev, 1, 0x15, 0x01, 1);
 
 		/* swap I and Q ADC, this allows to select between two inputs */
-		rtlsdr_demod_write_reg(dev, 0, 0x06, 0x90, 1);
+		//rtlsdr_demod_write_reg(dev, 0, 0x06, 0x90, 1);
 		break;
 	case RTLSDR_TUNER_UNKNOWN:
 		fprintf(stderr, "No supported tuner found\n");
