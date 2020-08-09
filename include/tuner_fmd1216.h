@@ -33,7 +33,7 @@
 #define FMD1216_CB_DEF 0xB0 // CP=0, T2T1T0=110, RSARSB=00, OS=0 - 125khz tune
 
 #define FMD1216_IF_FREQ 36125000 //36.125 MHz
-#define FMD1216_IF_OFFSET -45000 //45 KHz
+#define FMD1216_IF_OFFSET 25000 //25 KHz
 
 struct fmd1216_state {
 	uint16_t lastfreq;
