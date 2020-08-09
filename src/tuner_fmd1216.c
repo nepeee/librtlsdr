@@ -18,7 +18,7 @@ int fmd1216_set_freq(struct fmd1216_state *priv, uint32_t freq) {
 	uint16_t mod;
 
 	freq = freq + FMD1216_IF_FREQ - FMD1216_IF_OFFSET;
-	
+
 	mod = freq % 125000;
 	freq = freq / 125000;
 	if (mod>6249)
