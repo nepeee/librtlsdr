@@ -17,15 +17,13 @@ int fmd1216_set_freq(struct fmd1216_state *priv, uint32_t freq) {
 	uint8_t band;
 	uint16_t mod;
 
-	freq /= 10;
-	
 	freq = freq + FMD1216_IF_FREQ;
-	mod = freq % 12500;
-	freq = freq / 12500;
+	
+	mod = freq % 125000;
+	freq = freq / 125000;
 	if (mod>6249)
 		freq = freq + 1;
 	
-
 	fprintf(stderr, "FREQ %d\n", freq);
 
 	if (freq!=priv->lastfreq) {
