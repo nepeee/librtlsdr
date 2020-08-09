@@ -1568,7 +1568,9 @@ int rtlsdr_open(rtlsdr_dev_t **out_dev, uint32_t index)
 	/* Probe tuners */
 	rtlsdr_set_i2c_repeater(dev, 1);
 
-	fprintf(stderr, "Found Philips FMD1216 tuner\n");
+	reg = rtlsdr_i2c_read_reg(dev, FMD1216_I2C_ADDR, 0);
+
+	fprintf(stderr, "Found Philips FMD1216 tuner %d\n", reg);
 	dev->tuner_type = RTLSDR_TUNER_FMD1216;
 	goto found;
 
