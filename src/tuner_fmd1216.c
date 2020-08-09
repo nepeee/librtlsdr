@@ -17,7 +17,7 @@ int fmd1216_set_freq(struct fmd1216_state *priv, uint32_t freq) {
 	uint8_t band;
 	uint16_t mod;
 
-	freq *= 10;
+	freq /= 10;
 	
 	freq = freq + FMD1216_IF_FREQ;
 	mod = freq % 12500;
