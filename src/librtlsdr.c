@@ -120,6 +120,7 @@ struct rtlsdr_dev {
 	int corr; /* ppm */
 	int gain; /* tenth dB */
 	struct e4k_state e4k_s;
+	struct fmd1216_state fmd1216_s;
 	struct r82xx_config r82xx_c;
 	struct r82xx_priv r82xx_p;
 	/* status */
@@ -265,6 +266,19 @@ int r820t_set_gain_mode(void *dev, int manual) {
 	return r82xx_set_gain(&devt->r82xx_p, manual, 0);
 }
 
+int _fmd1216_init(void *dev) {
+	rtlsdr_dev_t* devt = (rtlsdr_dev_t*)dev; 
+	return fmd1216_init(devt->fmd1216_s);
+}
+int _fmd1216_exit(void *dev) { return 0; }
+int _fmd1216_set_freq(void *dev, uint32_t freq) {
+	rtlsdr_dev_t* devt = (rtlsdr_dev_t*)dev;
+	return fmd1216_set_freq(devt->fmd1216_s, freq);
+}
+int _fmd1216_set_bw(void *dev, int bw) { return 0; }
+int _fmd1216_set_gain(void *dev, int gain) { return 0; }
+int _fmd1216_set_gain_mode(void *dev, int manual) { return 0; }
+
 /* definition order must match enum rtlsdr_tuner */
 static rtlsdr_tuner_iface_t tuners[] = {
 	{
@@ -299,6 +313,11 @@ static rtlsdr_tuner_iface_t tuners[] = {
 		r820t_init, r820t_exit,
 		r820t_set_freq, r820t_set_bw, r820t_set_gain, NULL,
 		r820t_set_gain_mode
+	},
+	{
+		_fmd1216_init, _fmd1216_exit,
+		_fmd1216_set_freq, _fmd1216_set_bw, _fmd1216_set_gain, NULL,
+		_fmd1216_set_gain_mode
 	},
 };
 
@@ -1208,7 +1227,14 @@ int rtlsdr_set_direct_sampling(rtlsdr_dev_t *dev, int on)
 
 			/* enable spectrum inversion */
 			r |= rtlsdr_demod_write_reg(dev, 1, 0x15, 0x01, 1);
-		} else {
+		}
+		else if (dev->tuner_type == RTLSDR_TUNER_FMD1216) {
+			r |= rtlsdr_set_if_freq(dev, FMD1216_IF_FREQ);
+
+			/* enable spectrum inversion */
+			r |= rtlsdr_demod_write_reg(dev, 1, 0x15, 0x01, 1);
+		}
+		else {
 			r |= rtlsdr_set_if_freq(dev, 0);
 
 			/* enable In-phase + Quadrature ADC input */
@@ -1219,7 +1245,7 @@ int rtlsdr_set_direct_sampling(rtlsdr_dev_t *dev, int on)
 		}
 
 		/* opt_adc_iq = 0, default ADC_I/ADC_Q datapath */
-		r |= rtlsdr_demod_write_reg(dev, 0, 0x06, 0x80, 1);
+		r |= rtlsdr_demod_write_reg(dev, 0, 0x06, (dev->tuner_type == RTLSDR_TUNER_FMD1216) ? 0x90 : 0x80, 1);
 
 		fprintf(stderr, "Disabled direct sampling mode\n");
 		dev->direct_sampling = 0;
@@ -1247,7 +1273,8 @@ int rtlsdr_set_offset_tuning(rtlsdr_dev_t *dev, int on)
 		return -1;
 
 	if ((dev->tuner_type == RTLSDR_TUNER_R820T) ||
-	    (dev->tuner_type == RTLSDR_TUNER_R828D))
+	    (dev->tuner_type == RTLSDR_TUNER_R828D) ||
+	    (dev->tuner_type == RTLSDR_TUNER_FMD1216))
 		return -2;
 
 	if (dev->direct_sampling)
@@ -1538,6 +1565,10 @@ int rtlsdr_open(rtlsdr_dev_t **out_dev, uint32_t index)
 	/* Probe tuners */
 	rtlsdr_set_i2c_repeater(dev, 1);
 
+	fprintf(stderr, "Found Philips FMD1216 tuner\n");
+	dev->tuner_type = RTLSDR_TUNER_FMD1216;
+	goto found;
+
 	reg = rtlsdr_i2c_read_reg(dev, E4K_I2C_ADDR, E4K_CHECK_ADDR);
 	if (reg == E4K_CHECK_VAL) {
 		fprintf(stderr, "Found Elonics E4000 tuner\n");
@@ -1610,6 +1641,22 @@ found:
 
 		/* enable spectrum inversion */
 		rtlsdr_demod_write_reg(dev, 1, 0x15, 0x01, 1);
+		break;
+	case RTLSDR_TUNER_FMD1216:
+		/* disable Zero-IF mode */
+		rtlsdr_demod_write_reg(dev, 1, 0xb1, 0x1a, 1);
+
+		/* only enable In-phase ADC input */
+		rtlsdr_demod_write_reg(dev, 0, 0x08, 0x4d, 1);
+
+		/* the FMD1216 use 36 MHz IF */
+		rtlsdr_set_if_freq(dev, FMD1216_IF_FREQ);
+
+		/* enable spectrum inversion */
+		rtlsdr_demod_write_reg(dev, 1, 0x15, 0x01, 1);
+
+		/* swap I and Q ADC, this allows to select between two inputs */
+		rtlsdr_demod_write_reg(dev, 0, 0x06, 0x90, 1);
 		break;
 	case RTLSDR_TUNER_UNKNOWN:
 		fprintf(stderr, "No supported tuner found\n");
